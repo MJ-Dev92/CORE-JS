@@ -1,5 +1,3 @@
-# 3장 this
-
 ## 3.1 상황에 따라 달라지는 this
 
 - 자바스크립트에서 this는 기본적으로 실행 컨텍스트가 생성될 때 함께 결정된다.
@@ -77,3 +75,49 @@ obj1.outer();
 - this 바인딩에 관해서는 함수를 실행하는 당시의 주변 환경은 중요하지 않고, 오직 해당 함수를 호출하는 구문 앞에 점 또는 대괄호 표기가 있는지 없는지가 관건인 것입니다.
 
 **메서드이 내부 함수에서의 this를 우회하는 방법**
+
+```jsx
+var obj = {
+  outer: function () {
+    console.log(this); // 1.{ outer: f }
+    var innerFunc1 = function () {
+      console.log(this); // 2. Window {...}
+    };
+    innerFunc1();
+
+    var self = this;
+    var innerFinc2 = function () {
+      console.log(self); // 3. { outer: f }
+    };
+    innerFunc2();
+  },
+};
+obj.outer();
+```
+
+**this를 바인딩하지 않는 함수**
+
+- ES6에서 함수 내부에서 this가 전역객체를 바라보는 문제를 보완하고자, this 바인딩하지 않는 화살표 함수를 새로 도입했습니다.
+- 화살표 함수는 실행 컨텍스트를 생성할 때 this 바인딩 과정 자체가 빠지게 되어, 상위 스코프의 this를 그대로 활용할 수 있다. 내부함수를 화살표 함수를 바꾸면 우회법이 불필요해진다.
+- 그 밖에도 call, apply등의 메서드를 활용해 함수를 호출할 때 명시적으로 this를 지정하는 방법이 있다.
+
+### 3.1.4 콜백 함수 호출 시 그 함수 내부에서의 this
+
+```jsx
+setTimeout(function () {
+  console.log(this);
+}, 300);
+
+[1, 2, 3, 4, 5].forEach(function (x) {
+  console.log(this, x);
+});
+
+document.body.innerHTML += '<button id = "a">클릭</button>';
+document.body.quertSelector("#a").addEventListener("click", function (e) {
+  console.log(this, e);
+});
+```
+
+- 콜백 함수의 제어권을 가지는 함수(메서드)가 콜백 함수에서의 this를 무엇으로 할지를 결정하며, 특별히 정의하지 않은 경우에는 기본적으로 함수와 마찬가지로 전역객체를 바라본다
+
+### 3.1.5 생성자 함수 내부에서의 this
